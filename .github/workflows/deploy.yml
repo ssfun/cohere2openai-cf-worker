@@ -1,6 +1,7 @@
 name: Deploy Worker
 on:
-  workflow_dispatch:
+  push:
+  repository_dispatch:
 
 jobs:
   deploy:
@@ -8,11 +9,6 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
-
-      - name: Modify /src/api.ts before deployment
-        run: |
-          sed '/const body = await c.req.json<OpenAI.ChatCompletionCreateParams>();/a\ \ if (body.frequency_penalty === 1 \&\& body.presence_penalty === 1) {\n    body.frequency_penalty = 0;\n  }' src/api.ts > src/temp_api.ts && mv src/temp_api.ts src/api.ts
-
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
